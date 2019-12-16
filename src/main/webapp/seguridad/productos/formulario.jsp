@@ -40,7 +40,7 @@
                                    class="form-control" 
                                    id="nombre" 
                                    required
-                                   placeholder="MÃ­nimo 2 MÃ¡ximo 150"
+                                   placeholder="Mínimo 2 - Máximo 150"
                                    pattern=".{2,150}"
                                    aria-describedby="nombreHelp">
                             <small id="nombreHelp" class="form-text text-muted">Nombre y descripcion del producto</small>

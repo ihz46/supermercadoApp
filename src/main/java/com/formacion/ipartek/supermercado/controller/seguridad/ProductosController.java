@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.formacion.ipartek.supermercado.modelo.dao.ProductoDAO;
+import com.formacion.ipartek.supermercado.modelo.pojo.Producto;
 
 /**
  * Servlet implementation class ProductosController
@@ -18,7 +19,7 @@ public class ProductosController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String VIEW_TABLA ="/productos/index.jsp";
 	private static final String VIEW_FORM = "/productos/formulario.jsp";
-	private static final String FORWARD = "/productos/index.jsp";
+	private static  String vistaSeleccionada = VIEW_TABLA;
 	private static  ProductoDAO dao;
 	
 	//Acciones:
@@ -106,7 +107,7 @@ public class ProductosController extends HttpServlet {
 		} catch (Exception e) {
 			// TODO: log
 		}finally {
-			request.getRequestDispatcher(FORWARD).forward(request, response);
+			request.getRequestDispatcher(vistaSeleccionada).forward(request, response);
 		}
 		
 	}
@@ -118,7 +119,13 @@ public class ProductosController extends HttpServlet {
 
 
 	private void irFormulario(HttpServletRequest request, HttpServletResponse response) {
-				
+		//TODO-> preguntar por ID > 0 = recuperar del DAO
+		//sino , new producto();
+		
+		//dao.getbyid = >implementar
+		
+		request.setAttribute("producto", new Producto());
+		vistaSeleccionada = VIEW_FORM;
 	}
 
 
