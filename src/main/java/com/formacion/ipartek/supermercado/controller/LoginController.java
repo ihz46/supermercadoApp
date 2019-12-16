@@ -43,6 +43,8 @@ public class LoginController extends HttpServlet {
 				
 				session.setAttribute("usuarioLogueado", user);
 				session.setMaxInactiveInterval(60*5);
+				//base
+				
 				
 				view = "seguridad/index.jsp";
 			}else {

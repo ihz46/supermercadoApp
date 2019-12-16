@@ -12,11 +12,12 @@ public interface IDAO<P> {
 	List<P> getAll();
 	
 	/**
-	 * recupera un pojo por su identificador
-	 * @param id identificador
-	 * @return pojo si lo encuentra, si no null
+	 * 
+	 * @param id
+	 * @return Pojo 
+	 * @throws Exception si no encuentra el perro por id
 	 */
-	P getById(int id);
+	P getById(int id) throws Exception;
 	
 	/**
 	 * Elimina

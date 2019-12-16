@@ -1,6 +1,7 @@
 package com.formacion.ipartek.supermercado.controller.seguridad;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -8,6 +9,9 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.log4j.Logger;
+
 import com.formacion.ipartek.supermercado.modelo.dao.ProductoDAO;
 import com.formacion.ipartek.supermercado.modelo.pojo.Producto;
 
@@ -16,11 +20,18 @@ import com.formacion.ipartek.supermercado.modelo.pojo.Producto;
  */
 @WebServlet("/seguridad/productos")
 public class ProductosController extends HttpServlet {
+	
+	//Log
+	
+	private final static Logger log = Logger.getLogger(ProductosController.class);
+	
+	//Constantes
 	private static final long serialVersionUID = 1L;
 	private static final String VIEW_TABLA ="/productos/index.jsp";
 	private static final String VIEW_FORM = "/productos/formulario.jsp";
 	private static  String vistaSeleccionada = VIEW_TABLA;
 	private static  ProductoDAO dao;
+	
 	
 	//Acciones:
 	
@@ -76,6 +87,7 @@ public class ProductosController extends HttpServlet {
 		String pDescripcion = request.getParameter("descripcion");
 		String pDescuento = request.getParameter("descuento");
 		
+		String base = request.getContextPath();
 		try {
 			
 			request.setAttribute("productos", dao.getAll());
@@ -83,18 +95,22 @@ public class ProductosController extends HttpServlet {
 			switch (pAccion) {
 			case ACCION_LISTAR:
 				listar(request, response);
+				log.debug("listamos");
 				break;
 				
 			case ACCION_GUARDAR:
 				guardar(request, response);
+				log.debug("guardar");
 				break;
 				
 			case ACCION_IR_FORMULARIO:
 				irFormulario(request, response);
+				log.debug("formulario");
 				break;
 				
 			case ACCION_ELIMINAR:
 				eliminar(request, response);
+				log.debug("Eliminamos");
 				break;
 				
 			default:
@@ -107,20 +123,29 @@ public class ProductosController extends HttpServlet {
 		} catch (Exception e) {
 			// TODO: log
 		}finally {
-			request.getRequestDispatcher(vistaSeleccionada).forward(request, response);
+			String url = base + vistaSeleccionada;
+			System.out.println(url);
+			request.getRequestDispatcher( vistaSeleccionada).forward(request, response);
 		}
 		
 	}
 
 
-	private void eliminar(HttpServletRequest request, HttpServletResponse response) {
-			
+	private void eliminar(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		try {
+			int idParseado = Integer.parseInt(pId);	
+			dao.delete(idParseado);
+		} catch (Exception e) {
+			log.error("Error al parsear el id");
+		}
 	}
 
 
 	private void irFormulario(HttpServletRequest request, HttpServletResponse response) {
-		//TODO-> preguntar por ID > 0 = recuperar del DAO
-		//sino , new producto();
+		//Comprobamos que el id introducido sea mayor que 0.
+		
+		
+		
 		
 		//dao.getbyid = >implementar
 		
@@ -130,7 +155,28 @@ public class ProductosController extends HttpServlet {
 
 
 	private void guardar(HttpServletRequest request, HttpServletResponse response) {
-
+		try {
+			
+			int idNumerico = Integer.parseInt(pId);
+			if (idNumerico>0) {
+				//Comprobamos que no este en la lista
+				List<Producto> listaProductos = dao.getAll();
+				
+				for (int i = 0; i < listaProductos.size(); i++) {
+					if (idNumerico == listaProductos.get(i).getId()) {
+						Producto p = new Producto();
+						p.setId(idNumerico);
+						p.setNombre(pNombre);
+						dao.create(p);
+						
+					}
+				}
+			}else {
+				//error
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 

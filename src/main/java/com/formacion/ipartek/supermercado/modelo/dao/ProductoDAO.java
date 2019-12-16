@@ -3,6 +3,8 @@ package com.formacion.ipartek.supermercado.modelo.dao;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.validator.internal.util.IgnoreJava6Requirement;
+
 import com.formacion.ipartek.supermercado.modelo.pojo.Producto;
 
 public class ProductoDAO implements IDAO<Producto> {
@@ -129,27 +131,75 @@ public class ProductoDAO implements IDAO<Producto> {
 	}
 
 	@Override
-	public Producto getById(int id) {
-		// TODO Auto-generated method stub
-		return null;
+	public Producto getById(int id) throws Exception {
+		Producto producto = null;
+		for (Producto p : registros) {
+			if (id==p.getId()) {
+				producto=p;
+				break;
+			}
+		}
+		
+		if (producto==null) {
+			throw new Exception("No hay ningún perro con el id " + id);
+		}
+		
+		return producto;
 	}
 
 	@Override
 	public Producto delete(int id) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		Producto producto = null;
+		for (Producto p : registros) {
+			if (id==p.getId()) {
+				producto = p;
+				registros.remove(p);
+				break;
+			}
+			
+		}
+		if (producto==null) {
+			throw new Exception("Perro no encontrado por su id");
+		}
+		return producto;
 	}
 
 	@Override
 	public Producto update(int id, Producto pojo) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		Producto producto = null;
+		for (int i = 0; i < registros.size(); i++) {
+			
+			if (id == registros.get(i).getId()) {
+				registros.remove(i);
+				registros.add(pojo);
+				producto = pojo;
+				break;
+				
+			}
+			
+			
+			
+		}
+		
+		if (producto == null) {
+			throw new Exception("No se ha encontrado al perro con el id " + pojo.getId());
+		}
+		return producto;
 	}
 
 	@Override
 	public Producto create(Producto pojo) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		Producto producto = pojo;
+		if (pojo!=null) {
+			pojo.setId(++indice);
+			registros.add(pojo);
+		}else {
+			
+			throw new Exception("Perro null");
+			
+		}
+		
+		return producto;
 	}
 
 }

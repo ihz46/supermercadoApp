@@ -2,6 +2,7 @@
  <%@include file="/includes/header.jsp" %>
  <%@include file="/includes/top-nav.jsp" %>
  
+<base href="${request.contextPath}" />
  
  	<h1>TABLA</h1>
 	
@@ -13,7 +14,8 @@
 		<c:forEach items="${productos}" var="p">
 			<li>
 				${p} <br>
-				<a href="/seguridad/productos?accion=formulario&id=${p.id}">Editar</a>
+				<a href="?accion=formulario&id=${p.id}">Editar</a>
+				<a href="?accion=eliminar&id=${p.id}">Eliminar</a>
 			</li>
 		</c:forEach>
 	</ol>
