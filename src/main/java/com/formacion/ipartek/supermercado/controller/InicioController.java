@@ -24,7 +24,12 @@ public class InicioController extends HttpServlet {
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
-		dao = ProductoDAO.getInstance();
+		try {
+			dao = ProductoDAO.getInstance();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
     

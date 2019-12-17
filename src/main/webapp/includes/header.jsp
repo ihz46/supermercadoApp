@@ -6,11 +6,13 @@
 
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
+
 <fmt:setLocale value="es_ES"/>
 
 <!doctype html>
 <html lang="es">
   <head>
+ 	<base href="${pageContext.request.contextPath }/"/>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
