@@ -15,12 +15,10 @@ public class ProductoDAO implements IDAO<Producto> {
 
 	private static ProductoDAO INSTANCE;
 
-	private static final String SQL_GET_ALL = "SELECT id , nombre FROM producto ORDER BY id DESC LIMIT 500;";
-	private static final String SQL_GET_BY_ID = "SELECT u.id, u.nombre, r.id as 'id_rol', r.nombre as 'nombre_rol',contrasenya, fecha_creacion, fecha_eliminacion FROM usuario as u, rol as r WHERE u.id_rol = r.id AND u.id = ?;";
+	private static final String SQL_GET_ALL = "SELECT id , nombre, precio, imagen, descripcion, descuento FROM producto ORDER BY id DESC LIMIT 500;";
+	private static final String SQL_GET_BY_ID = "SELECT id, nombre, precio, imagen, descripcion, descuento FROM producto id = ?";
 	private static final String SQL_GET_ALL_BY_NOMBRE = "SELECT u.id, u.nombre, r.id as 'id_rol', r.nombre as 'nombre_rol',contrasenya, fecha_creacion, fecha_eliminacion FROM usuario as u, rol as r WHERE u.id_rol = r.id AND u.nombre LIKE ? ORDER BY u.nombre ASC LIMIT 500;";
-	private static final String SQL_EXISTE = " SELECT u.id, u.nombre, r.id as 'id_rol', r.nombre as 'nombre_rol', contrasenya, fecha_creacion, fecha_eliminacion "
-			+ " FROM usuario as u, rol as r " + " WHERE u.id_rol = r.id AND u.nombre = ? AND contrasenya = ? ;";
-	private static final String SQL_INSERT = "INSERT INTO usuario ( nombre, contrasenya) VALUES ( ? , ?);";
+	private static final String SQL_INSERT = "INSERT INTO producto ( nombre, precio, imagen, descripcion, descuento) VALUES ( ? , ?, ?, ? , ?);";
 	private static final String SQL_UPDATE = "UPDATE usuario SET nombre= ?, contrasenya= ? WHERE id = ?;";
 	// private static final String SQL_DELETE = "DELETE FROM usuario WHERE id = ?;";
 	private static final String SQL_DELETE_LOGICO = "UPDATE usuario SET fecha_eliminacion = CURRENT_TIMESTAMP() WHERE id = ?;";
@@ -48,7 +46,13 @@ public class ProductoDAO implements IDAO<Producto> {
 
 			while (rs.next()) {
 				Producto p = new Producto();
-
+							
+				p.setId(rs.getInt("id"));
+				p.setNombre(rs.getString("nombre"));
+				p.setPrecio(rs.getFloat("precio"));
+				p.setImagen( rs.getString("imagen"));
+				p.setDescripcion(rs.getString("descripcion"));
+				p.setDescuento(rs.getInt("descuento"));	
 				registros.add(p);
 
 			}
@@ -71,9 +75,13 @@ public class ProductoDAO implements IDAO<Producto> {
 
 			try (ResultSet rs = pst.executeQuery()) {
 				if (rs.next()) {
-					String nombre = rs.getString("nombre");
-					producto.setId(id);
-					producto.setNombre(nombre);
+					producto = new Producto();
+					producto.setId(rs.getInt("id"));
+					producto.setNombre(rs.getString("nombre"));
+					producto.setPrecio(rs.getFloat("precio"));
+					producto.setImagen( rs.getString("imagen"));
+					producto.setDescripcion(rs.getString("descripcion"));
+					producto.setDescuento(rs.getInt("descuento"));	
 
 				}
 			}
@@ -101,24 +109,7 @@ public class ProductoDAO implements IDAO<Producto> {
 	@Override
 	public Producto update(int id, Producto pojo) throws Exception {
 		Producto producto = null;
-		/*
-		 * for (int i = 0; i < registros.size(); i++) {
-		 * 
-		 * if (id == registros.get(i).getId()) {
-		 * registros.get(i).setNombre(pojo.getNombre());
-		 * registros.get(i).setPrecio(pojo.getPrecio());
-		 * registros.get(i).setImagen(pojo.getImagen());
-		 * registros.get(i).setDescripcion(pojo.getDescripcion());
-		 * registros.get(i).setDescuento(pojo.getDescuento());
-		 * 
-		 * producto = registros.get(i);
-		 * 
-		 * break;
-		 * 
-		 * }
-		 * 
-		 * }
-		 */
+		
 
 		if (producto == null) {
 			throw new Exception("No se ha encontrado el producto id " + pojo.getId());
@@ -133,6 +124,10 @@ public class ProductoDAO implements IDAO<Producto> {
 			PreparedStatement pst = con.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS)){
 			
 			pst.setString(1, pojo.getNombre());
+			pst.setFloat(2, pojo.getPrecio());
+			pst.setString(3, pojo.getImagen());
+			pst.setString(4, pojo.getDescripcion());
+			pst.setString(5, pojo.getDescripcion());
 			
 			int filasAfectadas = pst.executeUpdate();
 			if (filasAfectadas==1) {

@@ -1,4 +1,4 @@
-package com.formacion.ipartek.supermercado.modelo.pojo;
+	package com.formacion.ipartek.supermercado.modelo.pojo;
 
 public class Producto {
 	
