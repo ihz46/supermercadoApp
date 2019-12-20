@@ -1,124 +1,34 @@
 package com.formacion.ipartek.supermercado.modelo.dao;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.validator.internal.util.IgnoreJava6Requirement;
-
+import com.formacion.ipartek.supermercado.modelo.bd.ConnectionManager;
 import com.formacion.ipartek.supermercado.modelo.pojo.Producto;
 
 public class ProductoDAO implements IDAO<Producto> {
 
 	private static ProductoDAO INSTANCE;
-	private ArrayList<Producto> registros;
-	private int indice = 0;
+
+	private static final String SQL_GET_ALL = "SELECT id , nombre FROM producto ORDER BY id DESC LIMIT 500;";
+	private static final String SQL_GET_BY_ID = "SELECT u.id, u.nombre, r.id as 'id_rol', r.nombre as 'nombre_rol',contrasenya, fecha_creacion, fecha_eliminacion FROM usuario as u, rol as r WHERE u.id_rol = r.id AND u.id = ?;";
+	private static final String SQL_GET_ALL_BY_NOMBRE = "SELECT u.id, u.nombre, r.id as 'id_rol', r.nombre as 'nombre_rol',contrasenya, fecha_creacion, fecha_eliminacion FROM usuario as u, rol as r WHERE u.id_rol = r.id AND u.nombre LIKE ? ORDER BY u.nombre ASC LIMIT 500;";
+	private static final String SQL_EXISTE = " SELECT u.id, u.nombre, r.id as 'id_rol', r.nombre as 'nombre_rol', contrasenya, fecha_creacion, fecha_eliminacion "
+			+ " FROM usuario as u, rol as r " + " WHERE u.id_rol = r.id AND u.nombre = ? AND contrasenya = ? ;";
+	private static final String SQL_INSERT = "INSERT INTO usuario ( nombre, contrasenya) VALUES ( ? , ?);";
+	private static final String SQL_UPDATE = "UPDATE usuario SET nombre= ?, contrasenya= ? WHERE id = ?;";
+	// private static final String SQL_DELETE = "DELETE FROM usuario WHERE id = ?;";
+	private static final String SQL_DELETE_LOGICO = "UPDATE usuario SET fecha_eliminacion = CURRENT_TIMESTAMP() WHERE id = ?;";
 
 	private ProductoDAO() throws Exception {
 		super();
-		registros = new ArrayList<Producto>();
-
-		Producto p = new Producto();
-		p.setId(1);
-		p.setNombre("Loctite");
-		p.setPrecio(100f);
-		p.setImagen(
-				"https://www.bricolemar.com/23057-thickbox_default/loctite-super-glue-3-20gr-profesional-henkel.jpg");
-		p.setDescripcion("Adhesivo potente");
-		p.setDescuento(20);
-
-		Producto p1 = new Producto();
-		p1.setId(2);
-		p1.setNombre("Lays campesinas");
-		p1.setPrecio(1.40f);
-		p1.setImagen("https://images-na.ssl-images-amazon.com/images/I/81dkp3s9ZvL._SX679_.jpg");
-		p1.setDescripcion("Patatas campesinas lays");
-		p1.setDescuento(10);
-
-		Producto p2 = new Producto();
-		p2.setId(3);
-		p2.setNombre("Jack Daniels");
-		p2.setPrecio(16.40f);
-		p2.setImagen("https://d1osgs5rdqb11o.cloudfront.net/products/main/317/317.thm350.jpg");
-		p2.setDescripcion("Botella whisky 70cl");
-		p2.setDescuento(7);
-
-		Producto p3 = new Producto();
-		p3.setId(4);
-		p3.setNombre("Vodka negro");
-		p3.setPrecio(12.20f);
-		p3.setImagen("https://www.bodecall.com/images/stories/virtuemart/product/eristoff_black.png");
-		p3.setDescripcion("Vozka eristoff negro, botella 70cl");
-		p3.setDescuento(20);
-
-		Producto p4 = new Producto();
-		p4.setId(5);
-		p4.setNombre("Jumpers mantequilla");
-		p4.setPrecio(0.40f);
-		p4.setImagen("https://www.bolinchelidrinkstore.com/1618-large_default/jumpers-de-mantequilla-42-grs-c30.jpg");
-		p4.setDescripcion("snacks de mantequilla, 42gr");
-		p4.setDescuento(10);
-
-		Producto p5 = new Producto();
-		p5.setId(6);
-		p5.setNombre("Pipas tijuana");
-		p5.setPrecio(0.45f);
-		p5.setImagen("https://www.grefusa.com/wp-content/uploads/2017/05/PipasG_Tijuana.png");
-		p5.setDescripcion("Pipas con sabor a tijuana");
-		p5.setDescuento(0);
-
-		Producto p6 = new Producto();
-		p6.setId(7);
-		p6.setNombre("Papa deltas");
-		p6.setPrecio(0.35f);
-		p6.setImagen("https://images-na.ssl-images-amazon.com/images/I/81Jc5-yC4ZL._SY445_.jpg");
-		p6.setDescripcion("Snacks tipicos");
-		p6.setDescuento(30);
-
-		Producto p7 = new Producto();
-		p7.setId(8);
-		p7.setNombre("Ketchup heinz");
-		p7.setPrecio(2.40f);
-		p7.setImagen("https://www.tuclubdecompras.es/contenidos/articulos/25/12602-001-1-2.jpg");
-		p7.setDescripcion("Ketchup de la mejor calidad");
-		p7.setDescuento(20);
-
-		Producto p8 = new Producto();
-		p8.setId(9);
-		p8.setNombre("Moet Chandon");
-		p8.setPrecio(40.50f);
-		p8.setImagen("https://images-na.ssl-images-amazon.com/images/I/715UyJpBfoL._SX569_.jpg");
-		p8.setDescripcion("Champagne de calidad");
-		p8.setDescuento(10);
-
-		Producto p9 = new Producto();
-		p9.setId(10);
-		p9.setNombre("Tinto crianza LAN");
-		p9.setPrecio(7.50f);
-		p9.setImagen("https://compraralproductor.com/673-large_default/vino-lan-crianza-2016.jpg");
-		p9.setDescripcion("Vino Riojano 2016");
-		p9.setDescuento(20);
-
-		
-		
-		create(p);
-		create(p1);
-		create(p2);
-		create(p3);
-		create(p4);
-		create(p5);
-		create(p6);
-		create(p7);
-		create(p8);
-		create(p9);
-
-		indice = 10;
 
 	}
-	
-	
-	
-	
-	
 
 	public static synchronized ProductoDAO getInstance() throws Exception {
 		if (INSTANCE == null) {
@@ -130,6 +40,22 @@ public class ProductoDAO implements IDAO<Producto> {
 
 	@Override
 	public List<Producto> getAll() {
+		List<Producto> registros = new ArrayList<Producto>();
+
+		try (Connection con = ConnectionManager.getConnection();
+				PreparedStatement pst = con.prepareStatement(SQL_GET_ALL);
+				ResultSet rs = pst.executeQuery()) {
+
+			while (rs.next()) {
+				Producto p = new Producto();
+
+				registros.add(p);
+
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 
 		return registros;
 	}
@@ -137,31 +63,35 @@ public class ProductoDAO implements IDAO<Producto> {
 	@Override
 	public Producto getById(int id) throws Exception {
 		Producto producto = null;
-		for (Producto p : registros) {
-			if (id == p.getId()) {
-				producto = p;
-				break;
+
+		try (Connection con = ConnectionManager.getConnection();
+				PreparedStatement pst = con.prepareStatement(SQL_GET_BY_ID)) {
+
+			pst.setInt(1, id);
+
+			try (ResultSet rs = pst.executeQuery()) {
+				if (rs.next()) {
+					String nombre = rs.getString("nombre");
+					producto.setId(id);
+					producto.setNombre(nombre);
+
+				}
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-
-		if (producto == null) {
-			throw new Exception("No hay ningún perro con el id " + id);
-		}
-
 		return producto;
 	}
 
 	@Override
 	public Producto delete(int id) throws Exception {
 		Producto producto = null;
-		for (Producto p : registros) {
-			if (id == p.getId()) {
-				producto = p;
-				registros.remove(p);
-				break;
-			}
-
-		}
+		/*
+		 * for (Producto p : registros) { if (id == p.getId()) { producto = p;
+		 * registros.remove(p); break; }
+		 * 
+		 * }
+		 */
 		if (producto == null) {
 			throw new Exception("Perro no encontrado por su id");
 		}
@@ -171,22 +101,24 @@ public class ProductoDAO implements IDAO<Producto> {
 	@Override
 	public Producto update(int id, Producto pojo) throws Exception {
 		Producto producto = null;
-		for (int i = 0; i < registros.size(); i++) {
-
-			if (id == registros.get(i).getId()) {
-				registros.get(i).setNombre(pojo.getNombre());
-				registros.get(i).setPrecio(pojo.getPrecio());
-				registros.get(i).setImagen(pojo.getImagen());
-				registros.get(i).setDescripcion(pojo.getDescripcion());
-				registros.get(i).setDescuento(pojo.getDescuento());
-				
-				producto = registros.get(i);
-				
-				break;
-
-			}
-		
-		}
+		/*
+		 * for (int i = 0; i < registros.size(); i++) {
+		 * 
+		 * if (id == registros.get(i).getId()) {
+		 * registros.get(i).setNombre(pojo.getNombre());
+		 * registros.get(i).setPrecio(pojo.getPrecio());
+		 * registros.get(i).setImagen(pojo.getImagen());
+		 * registros.get(i).setDescripcion(pojo.getDescripcion());
+		 * registros.get(i).setDescuento(pojo.getDescuento());
+		 * 
+		 * producto = registros.get(i);
+		 * 
+		 * break;
+		 * 
+		 * }
+		 * 
+		 * }
+		 */
 
 		if (producto == null) {
 			throw new Exception("No se ha encontrado el producto id " + pojo.getId());
@@ -196,17 +128,25 @@ public class ProductoDAO implements IDAO<Producto> {
 
 	@Override
 	public Producto create(Producto pojo) throws Exception {
-		Producto producto = pojo;
-		if (pojo != null) {
-			pojo.setId(++indice);
-			registros.add(pojo);
-		} else {
-
-			throw new Exception("Perro null");
-
-		}
-
-		return producto;
-	}
+		
+		try (Connection con = ConnectionManager.getConnection();	
+			PreparedStatement pst = con.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS)){
+			
+			pst.setString(1, pojo.getNombre());
+			
+			int filasAfectadas = pst.executeUpdate();
+			if (filasAfectadas==1) {
+				//Obtenemos el id del elemento creado
+				ResultSet rs = pst.getGeneratedKeys();
+				if (rs.next()) {
+					pojo.setId(rs.getInt(1));
+				}
+			}
+			
+			}
+		
+			return pojo;
+			
+		} 
 
 }
