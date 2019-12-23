@@ -21,7 +21,7 @@
 	});
 </script>
 
-<div class="footer-wrapper">
+<div class="footer-wrapper mt-4"">
         <footer class="container py-5">
             <div class="row">
                 <div class="col-12 col-md">

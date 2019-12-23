@@ -3,6 +3,7 @@ package com.formacion.ipartek.supermercado.controller.seguridad;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -10,6 +11,10 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 
 import org.apache.log4j.Logger;
 
@@ -34,6 +39,10 @@ public class ProductosController extends HttpServlet {
 	private static String vistaSeleccionada = VIEW_TABLA;
 	private static ProductoDAO dao;
 
+	// Crear Factoria y Validador
+	ValidatorFactory factory;
+	Validator validator;
+
 	// Acciones:
 
 	public static final String ACCION_LISTAR = "listar";
@@ -56,6 +65,11 @@ public class ProductosController extends HttpServlet {
 		super.init(config);
 		try {
 			dao = ProductoDAO.getInstance();
+
+			// Crear Factoria y Validador
+			factory = Validation.buildDefaultValidatorFactory();
+			validator = factory.getValidator();
+
 		} catch (Exception e) {
 
 			e.printStackTrace();
@@ -67,6 +81,7 @@ public class ProductosController extends HttpServlet {
 	public void destroy() {
 		super.destroy();
 		dao = null;
+		factory = null;
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -128,9 +143,11 @@ public class ProductosController extends HttpServlet {
 	private void eliminar(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		try {
 			int idParseado = Integer.parseInt(request.getParameter("id"));
+			Producto p = dao.getById(idParseado);
 			dao.delete(idParseado);
 			vistaSeleccionada = VIEW_TABLA;
-			request.setAttribute("mensajeAlerta", new Alerta(Alerta.TIPO_SUCCESS, "Se ha eliminado el producto con éxito"));
+			request.setAttribute("mensajeAlerta",
+					new Alerta(Alerta.TIPO_SUCCESS, "Se ha eliminado el producto " + p.getNombre() + " con éxito"));
 		} catch (Exception e) {
 			log.error("Error al parsear el id");
 		}
@@ -140,93 +157,96 @@ public class ProductosController extends HttpServlet {
 		String id = request.getParameter("id");
 		Producto p = null;
 		try {
-			
-				if ("".equals(id)||id==null) {
-					//Creamos un nuevo producto para rellenar el formulario
-					p=new Producto();
-					request.setAttribute("producto", p);
-					vistaSeleccionada = VIEW_FORM;
-				}else {
-					//Parseamos el id
-					int idParseado = Integer.parseInt(id);
-					p = dao.getById(idParseado);
-					request.setAttribute("producto", p);
-					vistaSeleccionada = VIEW_FORM;
-					
-				}
-		
-			} catch (NumberFormatException e) {
-				request.setAttribute("mensajeAlerta", new Alerta(Alerta.TIPO_DANGER, "Error al parsear el id"));
-				vistaSeleccionada = VIEW_TABLA;
-			}  catch (Exception e) {
-				request.setAttribute("mensajeAlerta", new Alerta(Alerta.TIPO_DANGER, "Excepción no controlada "+ e.getMessage()));
-				vistaSeleccionada = VIEW_TABLA;
+
+			if ("".equals(id) || id == null) {
+				// Creamos un nuevo producto para rellenar el formulario
+				p = new Producto();
+				request.setAttribute("producto", p);
+				vistaSeleccionada = VIEW_FORM;
+			} else {
+				// Parseamos el id
+				int idParseado = Integer.parseInt(id);
+				p = dao.getById(idParseado);
+				request.setAttribute("producto", p);
+				vistaSeleccionada = VIEW_FORM;
+
 			}
-		
-		
+
+		} catch (NumberFormatException e) {
+			request.setAttribute("mensajeAlerta", new Alerta(Alerta.TIPO_DANGER, "Error al parsear el id"));
+			vistaSeleccionada = VIEW_TABLA;
+		} catch (Exception e) {
+			request.setAttribute("mensajeAlerta",
+					new Alerta(Alerta.TIPO_DANGER, "Excepción no controlada " + e.getMessage()));
+			vistaSeleccionada = VIEW_TABLA;
+		}
+
 	}
 
-	private void guardar(HttpServletRequest request, HttpServletResponse response) {
-		//Recogemos los parámetros
+	private void guardar(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		Producto producto = null;
+		Producto p = new Producto();
+		int idParseado = 0;
+		Set<ConstraintViolation<Producto>> validaciones = null;
+
+		// Recogemos los parámetros
 		String pId = request.getParameter("id");
 		String pNombre = request.getParameter("nombre");
 		String pPrecio = request.getParameter("precio");
 		String pImagen = request.getParameter("imagen");
 		String pDescripcion = request.getParameter("descripcion");
 		String pDescuento = request.getParameter("descuento");
-		
-		//Comprobamos que no haya ningún parametro null
-		
-		if ("".equals(pId)||pId==null && "".equals(pNombre)||pNombre==null && "".equals(pPrecio)||pPrecio==null && "".equals(pImagen)||pImagen==null && "".equals(pDescripcion)|| pDescripcion==null && "".equals(pDescuento) || pDescuento==null) {
-			//Volvemos al formulario enviando en la request un mensaje
+		try {
+			// Comprobamos
+
+			idParseado = Integer.parseInt(pId);
+			float precioParseado = Float.parseFloat(pPrecio);
+			int descuentoParseado = Integer.parseInt(pDescuento);
+
+			p.setNombre(pNombre);
+			p.setPrecio(precioParseado);
+			p.setImagen(pImagen);
+			p.setDescripcion(pDescripcion);
+			p.setDescuento(descuentoParseado);
+
+			validaciones = validator.validate(p);
+		} catch (Exception e) {
+			request.setAttribute("mensajeAlerta", new Alerta(Alerta.TIPO_WARNING, "Error de parseo"));
+		}
+		// Comprobamos que no haya ningún parametro null
+
+		if (validaciones.size() > 0) {
+
+			StringBuilder mensaje = new StringBuilder();
+
+			for (ConstraintViolation<Producto> cv : validaciones) {
+				mensaje.append("<p>");
+				mensaje.append(cv.getPropertyPath()).append(": ");
+				mensaje.append(cv.getMessage());
+				mensaje.append(".</p>");
+
+			}
 			vistaSeleccionada = VIEW_FORM;
-			request.setAttribute("mensajeAlerta", new Alerta(Alerta.TIPO_DANGER, "Debes introducir todos los campos correctamente"));
-		}else {
-			
-			//Comprobamos 
-			try {
-				int idParseado = Integer.parseInt(pId);
-				float precioParseado = Float.parseFloat(pPrecio);
-				int descuentoParseado = Integer.parseInt(pDescuento);
-				Producto producto = null;
-				Producto p = new Producto();
-				p.setNombre(pNombre);
-				p.setPrecio(precioParseado);
-				p.setImagen(pImagen);
-				p.setDescripcion(pDescripcion);
-				p.setDescuento(descuentoParseado);
-				
-				if ("0".equals(pId)) {
-					//Instanciamos un nuevo pojo (producto)
-					
-					producto = dao.create(p);
-					vistaSeleccionada = VIEW_FORM;
-					request.setAttribute("producto", producto);
-					request.setAttribute("mensajeAlerta", new Alerta(Alerta.TIPO_SUCCESS, "Se ha creado el producto " + producto.getNombre() + " con éxito."));
-					
-				}else {
-					producto = dao.update(idParseado, p);
-					vistaSeleccionada = VIEW_FORM;
-					request.setAttribute("producto", producto);
-					request.setAttribute("mensajeAlerta", new Alerta(Alerta.TIPO_SUCCESS, "Se ha actualizado el producto " + producto.getNombre() + " con éxito."));
-				}
-				
-				
-				
-				
-			} catch (NumberFormatException e) {
+			request.setAttribute("mensajeAlerta", new Alerta(Alerta.TIPO_WARNING, mensaje.toString()));
+		} else {
+			if ("0".equals(pId)) {
+				// Instanciamos un nuevo pojo (producto)
+
+				producto = dao.create(p);
 				vistaSeleccionada = VIEW_FORM;
-				request.setAttribute("mensajeAlerta", new Alerta(Alerta.TIPO_DANGER, "Error de parseo: " + e.getMessage()));
-			} catch (NullPointerException e) {
+				request.setAttribute("producto", producto);
+				request.setAttribute("mensajeAlerta", new Alerta(Alerta.TIPO_SUCCESS,
+						"Se ha creado el producto " + producto.getNombre() + " con éxito."));
+
+			} else {
+				producto = dao.update(idParseado, p);
 				vistaSeleccionada = VIEW_FORM;
-				request.setAttribute("mensajeAlerta", new Alerta(Alerta.TIPO_DANGER, "Existe algún campo nulo."));
-			} catch (Exception e) {
-				vistaSeleccionada = VIEW_FORM;
-				request.setAttribute("mensajeAlerta", new Alerta(Alerta.TIPO_DANGER, "Excepción no contemplada: " + e.getMessage()));
+				request.setAttribute("producto", producto);
+				request.setAttribute("mensajeAlerta", new Alerta(Alerta.TIPO_SUCCESS,
+						"Se ha actualizado el producto " + producto.getNombre() + " con éxito."));
 			}
 		}
-		
-		
+
 	}
 
 	private void listar(HttpServletRequest request, HttpServletResponse response) {

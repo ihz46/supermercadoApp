@@ -16,12 +16,10 @@ public class ProductoDAO implements IDAO<Producto> {
 	private static ProductoDAO INSTANCE;
 
 	private static final String SQL_GET_ALL = "SELECT id , nombre, precio, imagen, descripcion, descuento FROM producto ORDER BY id DESC LIMIT 500;";
-	private static final String SQL_GET_BY_ID = "SELECT id, nombre, precio, imagen, descripcion, descuento FROM producto id = ?";
-	private static final String SQL_GET_ALL_BY_NOMBRE = "SELECT u.id, u.nombre, r.id as 'id_rol', r.nombre as 'nombre_rol',contrasenya, fecha_creacion, fecha_eliminacion FROM usuario as u, rol as r WHERE u.id_rol = r.id AND u.nombre LIKE ? ORDER BY u.nombre ASC LIMIT 500;";
+	private static final String SQL_GET_BY_ID = "SELECT id, nombre, precio, imagen, descripcion, descuento FROM producto WHERE id = ?";
+	private static final String SQL_UPDATE = "UPDATE producto SET nombre = ?, precio = ?, imagen = ?, descripcion = ?, descuento = ? WHERE id = ?";
 	private static final String SQL_INSERT = "INSERT INTO producto ( nombre, precio, imagen, descripcion, descuento) VALUES ( ? , ?, ?, ? , ?);";
-	private static final String SQL_UPDATE = "UPDATE usuario SET nombre= ?, contrasenya= ? WHERE id = ?;";
-	// private static final String SQL_DELETE = "DELETE FROM usuario WHERE id = ?;";
-	private static final String SQL_DELETE_LOGICO = "UPDATE usuario SET fecha_eliminacion = CURRENT_TIMESTAMP() WHERE id = ?;";
+	private static final String SQL_DELETE_LOGICO = "DELETE  FROM producto WHERE id=?;";
 
 	private ProductoDAO() throws Exception {
 		super();
@@ -94,14 +92,21 @@ public class ProductoDAO implements IDAO<Producto> {
 	@Override
 	public Producto delete(int id) throws Exception {
 		Producto producto = null;
-		/*
-		 * for (Producto p : registros) { if (id == p.getId()) { producto = p;
-		 * registros.remove(p); break; }
-		 * 
-		 * }
-		 */
-		if (producto == null) {
-			throw new Exception("Perro no encontrado por su id");
+		
+		try(Connection con= ConnectionManager.getConnection();
+				PreparedStatement pst = con.prepareStatement(SQL_DELETE_LOGICO)){
+			
+			pst.setInt(1,id);
+			
+			producto = this.getById(id);
+			
+			int filasAfectadas = pst.executeUpdate();
+			if (filasAfectadas == 1) {
+				producto = null;
+			}else {
+				throw new Exception("No se han encontrado registros para el id =" + id);
+			}
+			
 		}
 		return producto;
 	}
@@ -109,11 +114,30 @@ public class ProductoDAO implements IDAO<Producto> {
 	@Override
 	public Producto update(int id, Producto pojo) throws Exception {
 		Producto producto = null;
-		
+		try (Connection con = ConnectionManager.getConnection();	
+				PreparedStatement pst = con.prepareStatement(SQL_UPDATE)){
 
-		if (producto == null) {
-			throw new Exception("No se ha encontrado el producto id " + pojo.getId());
+			pst.setString(1, pojo.getNombre());
+			pst.setFloat(2, pojo.getPrecio());
+			pst.setString(3, pojo.getImagen());
+			pst.setString(4, pojo.getDescripcion());
+			pst.setInt(5, pojo.getDescuento());
+			
+			
+			pst.setInt(6, id);
+			
+			producto = this.getById(id);
+			
+			int filasAfectadas = pst.executeUpdate();
+			if (filasAfectadas == 1) {
+				pojo.setId(id);
+			}else {
+				throw new Exception("No se han encontrado registros para el id =" + id);
+			}
+				
 		}
+
+		
 		return producto;
 	}
 
@@ -127,7 +151,7 @@ public class ProductoDAO implements IDAO<Producto> {
 			pst.setFloat(2, pojo.getPrecio());
 			pst.setString(3, pojo.getImagen());
 			pst.setString(4, pojo.getDescripcion());
-			pst.setString(5, pojo.getDescripcion());
+			pst.setInt(5, pojo.getDescuento());
 			
 			int filasAfectadas = pst.executeUpdate();
 			if (filasAfectadas==1) {
