@@ -22,6 +22,10 @@
    <!-- Bootstrap core CSS -->
    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
 
+	<!--  Datatables -->
+	
+	<link rel="stylesheet" href="cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css">
+	
    <!-- nuestro css -->
    <link rel="stylesheet" href="css/custom.css">
 		

@@ -161,15 +161,12 @@ public class ProductosController extends HttpServlet {
 			if ("".equals(id) || id == null) {
 				// Creamos un nuevo producto para rellenar el formulario
 				p = new Producto();
-				request.setAttribute("producto", p);
-				vistaSeleccionada = VIEW_FORM;
+				
 			} else {
 				// Parseamos el id
 				int idParseado = Integer.parseInt(id);
 				p = dao.getById(idParseado);
-				request.setAttribute("producto", p);
-				vistaSeleccionada = VIEW_FORM;
-
+				
 			}
 
 		} catch (NumberFormatException e) {
@@ -179,6 +176,9 @@ public class ProductosController extends HttpServlet {
 			request.setAttribute("mensajeAlerta",
 					new Alerta(Alerta.TIPO_DANGER, "Excepción no controlada " + e.getMessage()));
 			vistaSeleccionada = VIEW_TABLA;
+		}finally {
+			request.setAttribute("producto", p);
+			vistaSeleccionada = VIEW_FORM;
 		}
 
 	}
