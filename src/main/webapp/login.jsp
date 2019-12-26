@@ -16,7 +16,7 @@
     	  </div>
     	   <div class="form-group text-center">
 		    <label for="password">Contraseña:</label>
-		    <input type="password" class="form-control" name="password" value="admin" id="password" required>
+		    <input type="password" class="form-control" name="password" value="123456" id="password" required>
     	  </div>
     	  <button type="submit" class="btn btn-primary btn-block">Entrar</button>
 	 

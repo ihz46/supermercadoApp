@@ -9,6 +9,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.log4j.Logger;
+
+import com.formacion.ipartek.supermercado.modelo.dao.UsuarioDAO;
 import com.formacion.ipartek.supermercado.modelo.pojo.Usuario;
 
 
@@ -18,15 +21,15 @@ import com.formacion.ipartek.supermercado.modelo.pojo.Usuario;
 @WebServlet("/login")
 public class LoginController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private static final String USUARIO = "admin";
-	private static final String PASSWORD = "admin";
 	
-	//private final static Logger log = Logger.getLogger(PerrosController.class);   
+	private static  UsuarioDAO usuarioDAO = UsuarioDAO.getInstance();
+		
+	private final static Logger LOG = Logger.getLogger(LoginController.class);   
   
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doPost(request, response);
 	}
-
+	
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String view = "login.jsp";
@@ -37,21 +40,23 @@ public class LoginController extends HttpServlet {
 		
 		
 		try {
-			if (USUARIO.equalsIgnoreCase(nombre) && PASSWORD.equals(password)) {
-				Usuario user = new Usuario(nombre, password);
+			
+			Usuario usuario = usuarioDAO.exist(nombre, password);
+			if (usuario != null) {
+				
+				LOG.info("Login correcto " + usuario);
 				HttpSession session = request.getSession();
 				
-				session.setAttribute("usuarioLogueado", user);
+				session.setAttribute("usuarioLogueado", usuario);
 				session.setMaxInactiveInterval(60*5);
-				//base
-				
+					
 				
 				view = "seguridad/index.jsp";
 			}else {
 				request.setAttribute("mensajeAlerta",new Alerta(Alerta.TIPO_DANGER, "Credenciales incorrectas, prueba de nuevo"));
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOG.error(e);
 		}finally {
 			request.getRequestDispatcher(view).forward(request, response);
 		}

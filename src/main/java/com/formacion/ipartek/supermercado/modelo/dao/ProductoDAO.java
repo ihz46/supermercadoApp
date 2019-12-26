@@ -44,13 +44,13 @@ public class ProductoDAO implements IDAO<Producto> {
 
 			while (rs.next()) {
 				Producto p = new Producto();
-							
+
 				p.setId(rs.getInt("id"));
 				p.setNombre(rs.getString("nombre"));
 				p.setPrecio(rs.getFloat("precio"));
-				p.setImagen( rs.getString("imagen"));
+				p.setImagen(rs.getString("imagen"));
 				p.setDescripcion(rs.getString("descripcion"));
-				p.setDescuento(rs.getInt("descuento"));	
+				p.setDescuento(rs.getInt("descuento"));
 				registros.add(p);
 
 			}
@@ -77,9 +77,9 @@ public class ProductoDAO implements IDAO<Producto> {
 					producto.setId(rs.getInt("id"));
 					producto.setNombre(rs.getString("nombre"));
 					producto.setPrecio(rs.getFloat("precio"));
-					producto.setImagen( rs.getString("imagen"));
+					producto.setImagen(rs.getString("imagen"));
 					producto.setDescripcion(rs.getString("descripcion"));
-					producto.setDescuento(rs.getInt("descuento"));	
+					producto.setDescuento(rs.getInt("descuento"));
 
 				}
 			}
@@ -92,21 +92,21 @@ public class ProductoDAO implements IDAO<Producto> {
 	@Override
 	public Producto delete(int id) throws Exception {
 		Producto producto = null;
-		
-		try(Connection con= ConnectionManager.getConnection();
-				PreparedStatement pst = con.prepareStatement(SQL_DELETE_LOGICO)){
-			
-			pst.setInt(1,id);
-			
+
+		try (Connection con = ConnectionManager.getConnection();
+				PreparedStatement pst = con.prepareStatement(SQL_DELETE_LOGICO)) {
+
+			pst.setInt(1, id);
+
 			producto = this.getById(id);
-			
+
 			int filasAfectadas = pst.executeUpdate();
 			if (filasAfectadas == 1) {
 				producto = null;
-			}else {
+			} else {
 				throw new Exception("No se han encontrado registros para el id =" + id);
 			}
-			
+
 		}
 		return producto;
 	}
@@ -114,58 +114,56 @@ public class ProductoDAO implements IDAO<Producto> {
 	@Override
 	public Producto update(int id, Producto pojo) throws Exception {
 		Producto producto = null;
-		try (Connection con = ConnectionManager.getConnection();	
-				PreparedStatement pst = con.prepareStatement(SQL_UPDATE)){
+		try (Connection con = ConnectionManager.getConnection();
+				PreparedStatement pst = con.prepareStatement(SQL_UPDATE)) {
 
 			pst.setString(1, pojo.getNombre());
 			pst.setFloat(2, pojo.getPrecio());
 			pst.setString(3, pojo.getImagen());
 			pst.setString(4, pojo.getDescripcion());
 			pst.setInt(5, pojo.getDescuento());
-			
-			
+
 			pst.setInt(6, id);
-			
+
 			producto = this.getById(id);
-			
+
 			int filasAfectadas = pst.executeUpdate();
 			if (filasAfectadas == 1) {
 				pojo.setId(id);
-			}else {
+			} else {
 				throw new Exception("No se han encontrado registros para el id =" + id);
 			}
-				
+
 		}
 
-		
 		return producto;
 	}
 
 	@Override
 	public Producto create(Producto pojo) throws Exception {
-		
-		try (Connection con = ConnectionManager.getConnection();	
-			PreparedStatement pst = con.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS)){
-			
+
+		try (Connection con = ConnectionManager.getConnection();
+				PreparedStatement pst = con.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS)) {
+
 			pst.setString(1, pojo.getNombre());
 			pst.setFloat(2, pojo.getPrecio());
 			pst.setString(3, pojo.getImagen());
 			pst.setString(4, pojo.getDescripcion());
 			pst.setInt(5, pojo.getDescuento());
-			
+
 			int filasAfectadas = pst.executeUpdate();
-			if (filasAfectadas==1) {
-				//Obtenemos el id del elemento creado
+			if (filasAfectadas == 1) {
+				// Obtenemos el id del elemento creado
 				ResultSet rs = pst.getGeneratedKeys();
 				if (rs.next()) {
 					pojo.setId(rs.getInt(1));
 				}
 			}
-			
-			}
-		
-			return pojo;
-			
-		} 
+
+		}
+
+		return pojo;
+
+	}
 
 }

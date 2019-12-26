@@ -154,6 +154,11 @@ flex-grow:0
     width: 100%;
 }
 
+/*Tablas personalizadas*/
+
+.tabla th{
+	text-transform: uppercase;
+}
 /****DATATABLES*/
 
 table,tr,td{

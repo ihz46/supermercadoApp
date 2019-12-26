@@ -8,10 +8,16 @@
 	
 	<h2>Listado de productos</h2>
 	
-	<table id="tablaProductos">
-			<thead>
+	<table class="tabla table">
+			<thead class="thead-dark">
 				<tr>
-					<th>ID</th><th>NOMBRE</th><th>IMAGEN</th><th>PRECIO</th><th>DESCRIPCIÓN</th><th>DESCUENTO</th>
+					<th>ID</th>
+					<th>NOMBRE</th>
+					<th>IMAGEN</th>
+					<th>PRECIO</th>
+					<th>DESCRIPCIÓN</th>
+					<th>DESCUENTO</th>
+					<th></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -22,7 +28,7 @@
 						<td class="producto"><img src="${p.imagen }" alt="imagen del producto ${p.imagen }" /></td>
 						<td>${p.precio } €</td>
 						<td>${p.descripcion }</td>
-						<td>${p.descuento} %</td>
+						<td>${p.descuento }%</td>
 						<td><a href="seguridad/productos?accion=formulario&id=${p.id}">Editar</a></td>
 			
 					</tr>

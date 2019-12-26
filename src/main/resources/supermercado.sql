@@ -24,10 +24,11 @@ CREATE TABLE IF NOT EXISTS `producto` (
   `imagen` varchar(150) NOT NULL,
   `descripcion` varchar(150) NOT NULL,
   `descuento` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `nombre` (`nombre`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 
--- Volcando datos para la tabla supermercado.producto: ~3 rows (aproximadamente)
+-- Volcando datos para la tabla supermercado.producto: ~4 rows (aproximadamente)
 /*!40000 ALTER TABLE `producto` DISABLE KEYS */;
 INSERT INTO `producto` (`id`, `nombre`, `precio`, `imagen`, `descripcion`, `descuento`) VALUES
 	(1, 'leche', 2, 'https://www.lavanguardia.com/r/GODO/LV/p5/WebSite/2018/11/05/Recortada/img_jperezf_20180723-154950_imagenes_lv_otras_fuentes_fotonoticia_2018072013240', 'de cabra', 0),
@@ -35,6 +36,22 @@ INSERT INTO `producto` (`id`, `nombre`, `precio`, `imagen`, `descripcion`, `desc
 	(3, 'tortilla', 1.2, 'https://s4.eestatic.com/2019/10/30/cocinillas/recetas/aperitivos-y-entrantes/Tortilla-Patatas-Tortilla_de_patata-Recetas_Rapidas-Videorreceta-Aperitiv', 'la buena tortilla', 0),
 	(4, 'queso', 34, 'https://quesospeinaovejas.com/119-large_default/queso-iberico-de-oveja-con-jamon-cuna.jpg', 'manchego', 0);
 /*!40000 ALTER TABLE `producto` ENABLE KEYS */;
+
+-- Volcando estructura para tabla supermercado.usuario
+CREATE TABLE IF NOT EXISTS `usuario` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_name` varchar(50) NOT NULL DEFAULT '0',
+  `password` varchar(50) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_name` (`user_name`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+
+-- Volcando datos para la tabla supermercado.usuario: ~0 rows (aproximadamente)
+/*!40000 ALTER TABLE `usuario` DISABLE KEYS */;
+INSERT INTO `usuario` (`id`, `user_name`, `password`) VALUES
+	(1, 'admin', '123456'),
+	(2, 'dolores', '56789');
+/*!40000 ALTER TABLE `usuario` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
