@@ -20,7 +20,7 @@
 		<c:forEach items="${registros}" var="u">
 			<tr>
 				<td>${u.id}</td>
-				<td>${u.user_name}</td>
+				<td>${u.nombre}</td>
 				<td>${u.password}</td>
 				<td><a href="seguridad/usuarios?accion=formulario&id=${u.id}">Editar</a></td>
 			

@@ -21,6 +21,7 @@ import org.apache.log4j.Logger;
 import com.formacion.ipartek.supermercado.controller.Alerta;
 import com.formacion.ipartek.supermercado.modelo.dao.UsuarioDAO;
 import com.formacion.ipartek.supermercado.modelo.pojo.Usuario;
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 
 /**
  * Servlet implementation class UsuariosController
@@ -136,9 +137,16 @@ public class UsuariosController extends HttpServlet {
 			dao.delete(idParseado);
 			vistaSeleccionada = VIEW_TABLA;
 			request.setAttribute("mensajeAlerta",
-					new Alerta(Alerta.TIPO_SUCCESS, "Se ha eliminado el usuario " + u.getUser_name() + " con éxito"));
-		} catch (Exception e) {
-			LOG.error("Error al parsear el id");
+					new Alerta(Alerta.TIPO_SUCCESS, "Se ha eliminado el usuario " + u.getNombre() + " con éxito"));
+		} catch(MySQLIntegrityConstraintViolationException i) {
+			LOG.error(i);
+			vistaSeleccionada = VIEW_FORM;
+			request.setAttribute("mensajeAlerta", new Alerta(Alerta.TIPO_DANGER, "No se puede eliminar el usuario porque tiene productos asignados"));
+			
+		}catch (Exception e) {
+			vistaSeleccionada = VIEW_FORM;
+			LOG.error(e);
+			request.setAttribute("mensajeAlerta", new Alerta(Alerta.TIPO_DANGER, "Error, no se puede eliminar el usuario"));
 		}
 	}
 
@@ -191,7 +199,7 @@ public class UsuariosController extends HttpServlet {
 			idParseado = Integer.parseInt(idUsuario);
 			
 			
-			u.setUser_name(userName);
+			u.setNombre(userName);
 			u.setPassword(password);
 
 			
@@ -222,14 +230,14 @@ public class UsuariosController extends HttpServlet {
 				vistaSeleccionada = VIEW_TABLA;
 				request.setAttribute("usuario", user);
 				request.setAttribute("mensajeAlerta", new Alerta(Alerta.TIPO_SUCCESS,
-						"Se ha creado el usuario " + user.getUser_name() + " con éxito."));
+						"Se ha creado el usuario " + user.getNombre() + " con éxito."));
 
 			} else {
 				user = dao.update(idParseado, u);
 				vistaSeleccionada = VIEW_TABLA;
 				request.setAttribute("usuario", user);
 				request.setAttribute("mensajeAlerta", new Alerta(Alerta.TIPO_SUCCESS,
-						"Se ha actualizado el usuario " + user.getUser_name() + " con éxito."));
+						"Se ha actualizado el usuario " + user.getNombre() + " con éxito."));
 			}
 		}
 

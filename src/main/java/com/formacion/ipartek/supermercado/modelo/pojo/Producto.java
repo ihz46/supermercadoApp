@@ -28,6 +28,8 @@ public class Producto {
 	private String imagen;
 	private String descripcion;
 	
+	private Usuario usuario;
+	
 	@Min(0)
 	@Max(100)
 	private int descuento;
@@ -42,6 +44,7 @@ public class Producto {
 		this.imagen="https://image.flaticon.com/icons/png/512/372/372627.png";
 		this.descripcion="";
 		this.descuento=DESCUENTO_MIN;
+		this.usuario=new Usuario();
 	}
 	
 	//Getters y Setters
@@ -82,12 +85,22 @@ public class Producto {
 		this.descuento = descuento;
 	}
 
-	@Override
-	public String toString() {
-		return "Supermercado [id=" + id + ", nombre=" + nombre + ", precio=" + precio + ", imagen=" + imagen
-				+ ", descripcion=" + descripcion + ", descuento=" + descuento + "]";
+	public Usuario getUsuario() {
+		return usuario;
+	}
+
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
 	}
 	
+	
+
+	@Override
+	public String toString() {
+		return "Producto [id=" + id + ", nombre=" + nombre + ", precio=" + precio + ", imagen=" + imagen
+				+ ", descripcion=" + descripcion + ", usuario=" + usuario + ", descuento=" + descuento + "]";
+	}
+
 	public float getPrecioDescuento() {
 		float aDescontar = (this.precio * this.descuento) / 100; 
 		float precioFinal = this.precio - aDescontar;

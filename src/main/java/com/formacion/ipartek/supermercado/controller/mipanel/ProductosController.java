@@ -1,7 +1,6 @@
-package com.formacion.ipartek.supermercado.controller.seguridad;
+package com.formacion.ipartek.supermercado.controller.mipanel;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -27,7 +26,7 @@ import com.formacion.ipartek.supermercado.modelo.pojo.Usuario;
 /**
  * Servlet implementation class ProductosController
  */
-@WebServlet("/seguridad/productos")
+@WebServlet("/mipanel/productos")
 public class ProductosController extends HttpServlet {
 
 	// Log
@@ -39,8 +38,9 @@ public class ProductosController extends HttpServlet {
 	private static final String VIEW_TABLA = "productos/index.jsp";
 	private static final String VIEW_FORM = "productos/formulario.jsp";
 	private static String vistaSeleccionada = VIEW_TABLA;
-	private static ProductoDAO dao;
+	private static ProductoDAO daoProducto;
 	private static UsuarioDAO daoUsuario;
+	private Usuario usuarioLogueado;
 
 	// Crear Factoria y Validador
 	ValidatorFactory factory;
@@ -67,15 +67,16 @@ public class ProductosController extends HttpServlet {
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
 		try {
-			dao = ProductoDAO.getInstance();
+			daoProducto = ProductoDAO.getInstance();
+			daoUsuario = UsuarioDAO.getInstance();
 
 			// Crear Factoria y Validador
 			factory = Validation.buildDefaultValidatorFactory();
 			validator = factory.getValidator();
 
 		} catch (Exception e) {
-
-			e.printStackTrace();
+			LOG.error(e);
+			
 
 		}
 	}
@@ -83,7 +84,8 @@ public class ProductosController extends HttpServlet {
 	@Override
 	public void destroy() {
 		super.destroy();
-		dao = null;
+		daoUsuario = null;
+		daoProducto = null;
 		factory = null;
 	}
 
@@ -102,10 +104,11 @@ public class ProductosController extends HttpServlet {
 		// 1. Recoger parámetros
 
 		String pAccion = request.getParameter("accion");
+		usuarioLogueado = (Usuario) request.getSession().getAttribute("usuarioLogueado");
 
 		try {
 
-			request.setAttribute("productos", dao.getAll());
+			request.setAttribute("productos", daoUsuario.getAll());
 
 			switch (pAccion) {
 			case ACCION_LISTAR:
@@ -136,8 +139,7 @@ public class ProductosController extends HttpServlet {
 		} catch (Exception e) {
 			LOG.error(e);
 		} finally {
-			List<Producto> registros = dao.getAll();
-			request.setAttribute("registros", registros);
+			
 			request.getRequestDispatcher(vistaSeleccionada).forward(request, response);
 		}
 
@@ -146,20 +148,21 @@ public class ProductosController extends HttpServlet {
 	private void eliminar(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		try {
 			int idParseado = Integer.parseInt(request.getParameter("id"));
-			Producto p = dao.getById(idParseado);
-			dao.delete(idParseado);
+			Producto p = daoProducto.getById(idParseado);
+			daoProducto.delete(idParseado);
 			vistaSeleccionada = VIEW_TABLA;
+			request.setAttribute("registros",  daoProducto.getAll());
 			request.setAttribute("mensajeAlerta",
 					new Alerta(Alerta.TIPO_SUCCESS, "Se ha eliminado el producto " + p.getNombre() + " con éxito"));
 		} catch (Exception e) {
 			LOG.error("Error al parsear el id");
+			request.setAttribute("mensajeAlerta", "Error al eliminar el producto");
 		}
 	}
 
 	private void irFormulario(HttpServletRequest request, HttpServletResponse response) {
 		String id = request.getParameter("id");
 		Producto p = null;
-		List<Usuario> listaUsuarios = new ArrayList<Usuario>();
 		try {
 
 			if ("".equals(id) || id == null) {
@@ -169,13 +172,9 @@ public class ProductosController extends HttpServlet {
 			} else {
 				// Parseamos el id
 				int idParseado = Integer.parseInt(id);
-				p = dao.getById(idParseado);
-				
-				//Obtenemos la lista de todos los  usuarios, para luego enviarla a la request como atributo
-				listaUsuarios =  daoUsuario.getAll();
-				request.setAttribute("listaUsuarios", listaUsuarios);
-				
-								
+				LOG.debug(idParseado);
+				p = daoProducto.getById(idParseado);
+				LOG.debug(p);
 				
 			}
 
@@ -183,15 +182,12 @@ public class ProductosController extends HttpServlet {
 			request.setAttribute("mensajeAlerta", new Alerta(Alerta.TIPO_DANGER, "Error al parsear el id"));
 			vistaSeleccionada = VIEW_TABLA;
 		} catch (Exception e) {
-			LOG.error(e);
-			e.printStackTrace();
 			request.setAttribute("mensajeAlerta",
 					new Alerta(Alerta.TIPO_DANGER, "Excepción no controlada " + e.getMessage()));
 			vistaSeleccionada = VIEW_TABLA;
 		}finally {
 			request.setAttribute("producto", p);
-			request.setAttribute("listaUsuarios", listaUsuarios);
-			
+			request.setAttribute("listaUsuarios",daoUsuario.getAll());
 			vistaSeleccionada = VIEW_FORM;
 		}
 
@@ -212,7 +208,7 @@ public class ProductosController extends HttpServlet {
 		String pDescuento = request.getParameter("descuento");
 		try {
 			// Comprobamos
-
+			
 			idParseado = Integer.parseInt(pId);
 			float precioParseado = Float.parseFloat(pPrecio);
 			int descuentoParseado = Integer.parseInt(pDescuento);
@@ -222,6 +218,10 @@ public class ProductosController extends HttpServlet {
 			p.setImagen(pImagen);
 			p.setDescripcion(pDescripcion);
 			p.setDescuento(descuentoParseado);
+			
+			Usuario u = new Usuario();
+			u.setId(usuarioLogueado.getId());
+			p.setUsuario(u);
 
 			validaciones = validator.validate(p);
 		} catch (Exception e) {
@@ -246,16 +246,18 @@ public class ProductosController extends HttpServlet {
 			if ("0".equals(pId)) {
 				// Instanciamos un nuevo pojo (producto)
 
-				producto = dao.create(p);
+				producto = daoProducto.create(p);
 				vistaSeleccionada = VIEW_FORM;
 				request.setAttribute("producto", producto);
+				request.setAttribute("listaUsuarios", daoUsuario.getAll());
 				request.setAttribute("mensajeAlerta", new Alerta(Alerta.TIPO_SUCCESS,
 						"Se ha creado el producto " + producto.getNombre() + " con éxito."));
 
 			} else {
-				producto = dao.update(idParseado, p);
+				producto = daoProducto.update(idParseado, p);
 				vistaSeleccionada = VIEW_FORM;
-				request.setAttribute("producto", producto);
+				request.setAttribute("producto", daoProducto.getById(idParseado));
+				request.setAttribute("listaUsuarios", daoUsuario.getAll());
 				request.setAttribute("mensajeAlerta", new Alerta(Alerta.TIPO_SUCCESS,
 						"Se ha actualizado el producto " + producto.getNombre() + " con éxito."));
 			}
@@ -265,7 +267,8 @@ public class ProductosController extends HttpServlet {
 
 	private void listar(HttpServletRequest request, HttpServletResponse response) {
 
-		List<Producto> listaProductos = dao.getAll();
+		List<Producto> listaProductos = daoProducto.getAllByUser(usuarioLogueado.getId());
+		
 		request.setAttribute("registros", listaProductos);
 		vistaSeleccionada = VIEW_TABLA;
 

@@ -23,7 +23,7 @@
 		<div class="col-6">
 			<div class="form-group">
 				<label for="nombre">NOMBRE</label> <input type="text" name="nombre"
-					value="${usuario.user_name }" class="form-control"
+					value="${usuario.nombre }" class="form-control"
 					placeholder="Introduce el nombre"  autofocus>
 			</div>
 		</div>
@@ -81,7 +81,7 @@
 						</button>
 					</div>
 					<div class="modal-body">Se va a eliminar el usuario
-						${usuario.user_name}.</div>
+						${usuario.nombre}.</div>
 					<div class="row mt-2"></div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary"

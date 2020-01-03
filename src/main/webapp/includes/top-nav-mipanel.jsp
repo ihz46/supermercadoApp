@@ -33,21 +33,11 @@
 						aria-expanded="false"> Producto </a>
 
 					<div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-						<a class="dropdown-item" href="seguridad/productos?accion=listar">Todos</a> 
-						<a	class="dropdown-item" href="seguridad/productos?accion=formulario">Nuevo</a> 
+						<a class="dropdown-item" href="mipanel/productos?accion=listar">Todos</a> 
+						<a	class="dropdown-item" href="mipanel/productos?accion=formulario">Nuevo</a> 
 					</div>
 				</div>
-				<div class="dropdown show">
-					<a class="btn btn-lg  dropdown-toggle" href="#" role="button"
-						id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true"
-						aria-expanded="false"> Usuario </a>
-
-					<div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-						<a class="dropdown-item" href="seguridad/usuarios?accion=listar">Todos</a> 
-						<a class="dropdown-item" href="seguridad/usuarios?accion=formulario">Nuevo</a>
-					</div>
-				</div>
-				
+							
 				<a class="py-2 d-none d-md-inline-block" href="logout">Cerrar
 					Sesión</a>
 				<a class="py-2 d-none d-md-inline-block ">Hola ${usuarioLogueado.nombre}</a>

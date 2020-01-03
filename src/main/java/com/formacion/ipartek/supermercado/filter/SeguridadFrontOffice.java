@@ -13,22 +13,17 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
-
 /**
  * Servlet Filter implementation class SeguridadFilter
  */
 @WebFilter(dispatcherTypes = { DispatcherType.REQUEST, DispatcherType.FORWARD, DispatcherType.INCLUDE,
-		DispatcherType.ERROR }, urlPatterns = { "/seguridad/*" })
-public class SeguridadFilter implements Filter {
-	
-	private final static Logger LOG = Logger.getLogger(SeguridadFilter.class);
-
+		DispatcherType.ERROR }, urlPatterns = { "/mipanel/*" })
+public class SeguridadFrontOffice implements Filter {
 
     /**
      * Default constructor. 
      */
-    public SeguridadFilter() {
+    public SeguridadFrontOffice() {
         // TODO Auto-generated constructor stub
     }
 
@@ -44,14 +39,13 @@ public class SeguridadFilter implements Filter {
 	 */
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 		HttpServletRequest req = (HttpServletRequest) request;
-		
+	
 
 		HttpSession session = req.getSession();
 		
 		if (session.getAttribute("usuarioLogueado") == null) {
 			
-			LOG.warn("Se esta intentando violar el filtro de seguridad");
-			
+		
 			
 		} else {
 			// Dejamos continuar

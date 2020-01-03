@@ -2,10 +2,10 @@
 	pageEncoding="UTF-8"%>
 
 <%@include file="/includes/header.jsp"%>
-<%@include file="/includes/top-nav.jsp"%>
+<%@include file="/includes/top-nav-mipanel.jsp"%>
 
 
-<form action="seguridad/productos" method="post">
+<form action="mipanel/productos" method="post">
 
 	<input type="hidden" name="accion" value="guardar">
 	<div class="row">
@@ -14,7 +14,7 @@
 
 			<div class="form-group">
 				<label for="id">ID</label> <input type="number" name="id"
-					value="${producto.id}" class="form-control" readonly>
+					value="${producto.id}" class="form-control" readonly >
 			</div>
 
 		</div>
@@ -25,7 +25,7 @@
 			<div class="form-group">
 				<label for="nombre">NOMBRE</label> <input type="text" name="nombre"
 					value="${producto.nombre }" class="form-control"
-					placeholder="Introduce el nombre" autofocus>
+					placeholder="Introduce el nombre"  autofocus>
 			</div>
 		</div>
 
@@ -35,7 +35,7 @@
 			<div class="form-group">
 				<label for="imagen">IMAGEN</label> <input type="text" name="imagen"
 					value="${producto.imagen }" class="form-control"
-					placeholder="Introduce la URL de la imagen">
+					placeholder="Introduce la URL de la imagen" >
 			</div>
 		</div>
 	</div>
@@ -60,7 +60,8 @@
 			<div class="form-group">
 				<label for="descripcion">DESCRIPCIÓN</label> <input type="text"
 					name="descripcion" value="${producto.descripcion } "
-					class="form-control" placeholder="Introduce la descripción">
+					class="form-control" placeholder="Introduce la descripción"
+					>
 			</div>
 		</div>
 	</div>
@@ -69,26 +70,14 @@
 			<div class="form-group">
 				<label for="descuento">DESCUENTO</label> <input type="number"
 					name="descuento" min="0" max="100" value="${producto.descuento}"
-					class="form-control" placeholder="Introduce el descuento (0-100)">
-			</div>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-6">
-			<div class="form-group">
-				<label for="usuario">ELIGE UN USUARIO:</label>
-				<select	name="usuarioId" class="custom-select">
-					<c:forEach items="${listaUsuarios}" var="u">
-						<option value="${u.id}"  ${(u.id eq producto.usuario.id)?"selected":""} >${u.nombre}</option>
-					</c:forEach>
-					
-				</select>
+					class="form-control" placeholder="Introduce el descuento (0-100)"
+					>
 			</div>
 		</div>
 	</div>
 	<div class="row mb-2">
 		<div class="col-6">
-			<button type="submit" class="btn btn-primary btn-block">Enviar</button>
+			<input type="submit" class="btn btn-primary btn-block" value="${(producto.id>0)?"Modificar":"Crear" }"></button>
 		</div>
 	</div>
 
@@ -125,7 +114,7 @@
 						<button type="button" class="btn btn-secondary"
 							data-dismiss="modal">Close</button>
 						<a class="btn btn-danger btn-block"
-							href="seguridad/productos?id=${producto.id}&accion=eliminar">Eliminar</a>
+							href="mipanel/productos?id=${producto.id}&accion=eliminar">Eliminar</a>
 					</div>
 				</div>
 			</div>

@@ -1,10 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
  <%@include file="/includes/header.jsp" %>
- <%@include file="/includes/top-nav.jsp" %>
+<%@include file="/includes/top-nav-mipanel.jsp"%>
  
 
 	
-	<a href="seguridad/productos?accion=formulario">Nuevo Producto</a>
+	<a href="mipanel/productos?accion=formulario">Nuevo Producto</a>
 	
 	<h2>Listado de productos</h2>
 	
@@ -17,7 +17,6 @@
 					<th>PRECIO</th>
 					<th>DESCRIPCIÓN</th>
 					<th>DESCUENTO</th>
-					<th>USUARIO</th>
 					<th></th>
 				</tr>
 			</thead>
@@ -30,8 +29,7 @@
 						<td>${p.precio } €</td>
 						<td>${p.descripcion }</td>
 						<td>${p.descuento }%</td>
-						<td>${p.usuario.nombre}
-						<td><a href="seguridad/productos?accion=formulario&id=${p.id}">Editar</a></td>
+						<td><a href="mipanel/productos?accion=formulario&id=${p.id}">Editar</a></td>
 			
 					</tr>
 				</c:forEach>

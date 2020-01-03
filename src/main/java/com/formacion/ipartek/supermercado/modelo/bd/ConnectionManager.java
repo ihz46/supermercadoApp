@@ -2,9 +2,7 @@ package com.formacion.ipartek.supermercado.modelo.bd;
 
 import java.sql.Connection;
 
-
 import javax.naming.InitialContext;
-import javax.servlet.ServletContext;
 import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
@@ -31,7 +29,7 @@ public class ConnectionManager {
 			conn = ds.getConnection();
 
 		} catch (Exception e) {
-
+			LOG.error(e);
 			e.printStackTrace();
 			
 			

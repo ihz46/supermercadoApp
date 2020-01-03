@@ -10,20 +10,20 @@ public class Usuario {
 	
 	@NotBlank
 	@Size(min=2,max=50)
-	private String user_name;
+	private String nombre;
 	
 	@NotBlank
 	@Size(min=2,max=50)
 	private String password;
 	
+	private Rol rol;
 	
-	
-
 	public Usuario() {
 		super();
 		this.id = 0;
-		this.user_name = "";
+		this.nombre = "";
 		this.password= "";
+		this.rol = new Rol();
 	}
 	
 	public int getId() {
@@ -34,12 +34,12 @@ public class Usuario {
 		this.id = id;
 	}
 
-	public String getUser_name() {
-		return user_name;
+	public String getNombre() {
+		return nombre;
 	}
 
-	public void setUser_name(String user_name) {
-		this.user_name = user_name;
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
 	}
 
 	public String getPassword() {
@@ -50,10 +50,21 @@ public class Usuario {
 		this.password = password;
 	}
 
+	public Rol getRol() {
+		return rol;
+	}
+
+	public void setRol(Rol rol) {
+		this.rol = rol;
+	}
+
 	@Override
 	public String toString() {
-		return "Usuario [id=" + id + ", user_name=" + user_name + ", password=" + password + "]";
+		return "Usuario [id=" + id + ", nombre=" + nombre + ", password=" + password + ", rol=" + rol + "]";
 	}
+
+	
+
 	
 	
 	
