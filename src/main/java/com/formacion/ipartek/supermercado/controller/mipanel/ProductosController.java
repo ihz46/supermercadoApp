@@ -19,6 +19,7 @@ import org.apache.log4j.Logger;
 
 import com.formacion.ipartek.supermercado.controller.Alerta;
 import com.formacion.ipartek.supermercado.modelo.dao.ProductoDAO;
+import com.formacion.ipartek.supermercado.modelo.dao.ProductoException;
 import com.formacion.ipartek.supermercado.modelo.dao.UsuarioDAO;
 import com.formacion.ipartek.supermercado.modelo.pojo.Producto;
 import com.formacion.ipartek.supermercado.modelo.pojo.Usuario;
@@ -52,6 +53,7 @@ public class ProductosController extends HttpServlet {
 	public static final String ACCION_IR_FORMULARIO = "formulario";
 	public static final String ACCION_GUARDAR = "guardar"; // create y update
 	public static final String ACCION_ELIMINAR = "eliminar";
+	private boolean isRedirect;
 
 	// Variables globales:
 
@@ -76,7 +78,6 @@ public class ProductosController extends HttpServlet {
 
 		} catch (Exception e) {
 			LOG.error(e);
-			
 
 		}
 	}
@@ -101,6 +102,8 @@ public class ProductosController extends HttpServlet {
 
 	private void doAction(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		
+		isRedirect = false;
 		// 1. Recoger parámetros
 
 		String pAccion = request.getParameter("accion");
@@ -136,11 +139,21 @@ public class ProductosController extends HttpServlet {
 				break;
 			}
 
-		} catch (Exception e) {
+		} catch (ProductoException e) {
+			LOG.warn(e);
+			isRedirect = true;
+			
+		}
+		catch (Exception e) {
 			LOG.error(e);
 		} finally {
+			if (isRedirect) {
+				//Invalidamos la sesion del usuario.
+				response.sendRedirect(request.getContextPath() + "/logout" );
+			}else {
+				request.getRequestDispatcher(vistaSeleccionada).forward(request, response);
+			}
 			
-			request.getRequestDispatcher(vistaSeleccionada).forward(request, response);
 		}
 
 	}
@@ -148,10 +161,13 @@ public class ProductosController extends HttpServlet {
 	private void eliminar(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		try {
 			int idParseado = Integer.parseInt(request.getParameter("id"));
+			
 			Producto p = daoProducto.getById(idParseado);
-			daoProducto.delete(idParseado);
+			
+			daoProducto.deleteByUser(idParseado, usuarioLogueado.getId());
+			
 			vistaSeleccionada = VIEW_TABLA;
-			request.setAttribute("registros",  daoProducto.getAll());
+			request.setAttribute("registros", daoProducto.getAllByUser(usuarioLogueado.getId()));
 			request.setAttribute("mensajeAlerta",
 					new Alerta(Alerta.TIPO_SUCCESS, "Se ha eliminado el producto " + p.getNombre() + " con éxito"));
 		} catch (Exception e) {
@@ -168,14 +184,14 @@ public class ProductosController extends HttpServlet {
 			if ("".equals(id) || id == null) {
 				// Creamos un nuevo producto para rellenar el formulario
 				p = new Producto();
-				
+
 			} else {
 				// Parseamos el id
 				int idParseado = Integer.parseInt(id);
 				LOG.debug(idParseado);
-				p = daoProducto.getById(idParseado);
+				p = daoProducto.getByIdByUser(idParseado,usuarioLogueado.getId());
 				LOG.debug(p);
-				
+
 			}
 
 		} catch (NumberFormatException e) {
@@ -185,9 +201,9 @@ public class ProductosController extends HttpServlet {
 			request.setAttribute("mensajeAlerta",
 					new Alerta(Alerta.TIPO_DANGER, "Excepción no controlada " + e.getMessage()));
 			vistaSeleccionada = VIEW_TABLA;
-		}finally {
+		} finally {
 			request.setAttribute("producto", p);
-			request.setAttribute("listaUsuarios",daoUsuario.getAll());
+			request.setAttribute("registros", daoProducto.getAllByUser(usuarioLogueado.getId()));
 			vistaSeleccionada = VIEW_FORM;
 		}
 
@@ -208,19 +224,24 @@ public class ProductosController extends HttpServlet {
 		String pDescuento = request.getParameter("descuento");
 		try {
 			// Comprobamos
-			
+
 			idParseado = Integer.parseInt(pId);
-			float precioParseado = Float.parseFloat(pPrecio);
+			String precioComa = pPrecio.replace(",", ".");
+			LOG.debug(pPrecio);
+			float precioParseado = Float.parseFloat(precioComa);
 			int descuentoParseado = Integer.parseInt(pDescuento);
 
+			p.setId(idParseado);
 			p.setNombre(pNombre);
 			p.setPrecio(precioParseado);
 			p.setImagen(pImagen);
 			p.setDescripcion(pDescripcion);
 			p.setDescuento(descuentoParseado);
-			
+
 			Usuario u = new Usuario();
 			u.setId(usuarioLogueado.getId());
+			u.setNombre(usuarioLogueado.getNombre());
+			u.setRol(usuarioLogueado.getRol());
 			p.setUsuario(u);
 
 			validaciones = validator.validate(p);
@@ -254,10 +275,10 @@ public class ProductosController extends HttpServlet {
 						"Se ha creado el producto " + producto.getNombre() + " con éxito."));
 
 			} else {
-				producto = daoProducto.update(idParseado, p);
+				//TODO arreglar el updateByUser y el DeleteByUser
+				producto = daoProducto.updateByUser(p.getId(), usuarioLogueado.getId(), p);
 				vistaSeleccionada = VIEW_FORM;
 				request.setAttribute("producto", daoProducto.getById(idParseado));
-				request.setAttribute("listaUsuarios", daoUsuario.getAll());
 				request.setAttribute("mensajeAlerta", new Alerta(Alerta.TIPO_SUCCESS,
 						"Se ha actualizado el producto " + producto.getNombre() + " con éxito."));
 			}
@@ -268,7 +289,7 @@ public class ProductosController extends HttpServlet {
 	private void listar(HttpServletRequest request, HttpServletResponse response) {
 
 		List<Producto> listaProductos = daoProducto.getAllByUser(usuarioLogueado.getId());
-		
+
 		request.setAttribute("registros", listaProductos);
 		vistaSeleccionada = VIEW_TABLA;
 

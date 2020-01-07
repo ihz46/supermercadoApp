@@ -20,11 +20,11 @@ public class UsuarioDAO implements IUsuarioDAO {
 
 	private static final String SQL_GET_ALL = "SELECT u.id, user_name, PASSWORD, id_rol , r.nombre AS nombre_rol FROM usuario u, rol r " + 
 			"WHERE u.id_rol = r.id ;";
-	private static final String SQL_GET_BY_ID = "SELECT id, user_name, password , idfrom usuario WHERE id= ?;";
-	private static final String SQL_INSERT = "INSERT INTO usuario ( user_name, password ) VALUES (?,?);";
+	private static final String SQL_GET_BY_ID = "SELECT id, user_name, password , id_rol FROM usuario WHERE id= ?;";
+	private static final String SQL_INSERT = "INSERT INTO usuario ( user_name, password, id_rol ) VALUES (?,?,?);";
 	private static final String SQL_DELETE = "DELETE FROM usuario WHERE id=?;";
-	private static final String SQL_UPDATE = "UPDATE usuario SET user_name=?, password = ? WHERE id = ?;";
-	private static final String SQL_EXIST = "SELECT id, user_name 'nombre', password , id_rol FROM usuario WHERE user_name=? AND password=? ;";
+	private static final String SQL_UPDATE = "UPDATE usuario SET user_name=?, password = ?, id_rol = ? WHERE id = ?;";
+	private static final String SQL_EXIST = "SELECT usuario.id, user_name 'nombre', password , id_rol FROM usuario INNER JOIN rol ON id_rol = rol.id WHERE user_name=? AND password=? ;";
 
 	private static UsuarioDAO INSTANCE;
 
@@ -53,7 +53,7 @@ public class UsuarioDAO implements IUsuarioDAO {
 			while(rs.next()) {
 				Usuario u = new Usuario();
 				u.setId(rs.getInt("id"));
-				u.setNombre(rs.getString("nombre"));
+				u.setNombre(rs.getString("user_name"));
 				u.setPassword(rs.getString("password"));
 				r.setId(rs.getInt("id_rol"));
 				r.setNombre(rs.getString("nombre_rol"));
@@ -77,13 +77,17 @@ public class UsuarioDAO implements IUsuarioDAO {
 			
 			
 			pst.setInt(1, id);
-			
+			LOG.debug(pst);
 			try(ResultSet rs = pst.executeQuery()){
 				if (rs.next()) {
 					usuario = new Usuario();
 					usuario.setId(rs.getInt("id"));
 					usuario.setNombre(rs.getString("user_name"));
 					usuario.setPassword(rs.getString("password"));
+					int idRol = rs.getInt("id_rol");
+					String nombreRol = rs.getString("nombre_rol");
+					Rol r = new Rol(idRol, nombreRol);
+					usuario.setRol(r);
 				}
 			}
 		} catch (Exception e) {
@@ -121,8 +125,9 @@ public class UsuarioDAO implements IUsuarioDAO {
 				PreparedStatement pst = con.prepareStatement(SQL_UPDATE)) {
 			pst.setString(1, pojo.getNombre());
 			pst.setString(2, pojo.getPassword());
+			pst.setInt(3, pojo.getRol().getId());
 			
-			pst.setInt(3,id);
+			pst.setInt(4,id);
 
 			usuario = this.getById(id);
 
@@ -131,6 +136,8 @@ public class UsuarioDAO implements IUsuarioDAO {
 				usuario.setId(id);
 				usuario.setNombre(pojo.getNombre());
 				usuario.setPassword(pojo.getPassword());
+				
+				//TODO rolUsuario usuario.setRol(pojo.getRol().getId());
 			} else {
 				throw new Exception("No se han encontrado registros para el id =" + id);
 			}
@@ -146,6 +153,7 @@ public class UsuarioDAO implements IUsuarioDAO {
 
 			pst.setString(1, pojo.getNombre());
 			pst.setString(2, pojo.getPassword());
+			pst.setInt(3, pojo.getRol().getId());
 			
 			int filasAfectadas = pst.executeUpdate();
 			if (filasAfectadas == 1) {

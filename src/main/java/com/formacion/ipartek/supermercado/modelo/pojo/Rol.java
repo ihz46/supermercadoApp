@@ -1,22 +1,24 @@
 package com.formacion.ipartek.supermercado.modelo.pojo;
 
 public class Rol {
-	
+
 	public static final int ROL_USUARIO = 1;
 	public static final int ROL_ADMIN = 2;
-	
+
 	private int id;
 	private String nombre;
-	
+
 	public Rol() {
 		super();
-		this.id=ROL_USUARIO;
-		this.nombre="usuario";
+		this.id = ROL_USUARIO;
+		this.nombre = "usuario";
 	}
 
 	public Rol(int idRol, String nombre) {
 		this();
-		
+		this.id = idRol;
+		this.nombre = nombre;
+
 	}
 
 	public int getId() {
@@ -39,8 +41,5 @@ public class Rol {
 	public String toString() {
 		return "Rol [id=" + id + ", nombre=" + nombre + "]";
 	}
-	
-	
-	
-	
+
 }

@@ -20,6 +20,7 @@ import org.apache.log4j.Logger;
 
 import com.formacion.ipartek.supermercado.controller.Alerta;
 import com.formacion.ipartek.supermercado.modelo.dao.UsuarioDAO;
+import com.formacion.ipartek.supermercado.modelo.pojo.Rol;
 import com.formacion.ipartek.supermercado.modelo.pojo.Usuario;
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 
@@ -201,6 +202,7 @@ public class UsuariosController extends HttpServlet {
 			
 			u.setNombre(userName);
 			u.setPassword(password);
+			u.setRol(new Rol());
 
 			
 			validaciones = validator.validate(u);
