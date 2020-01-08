@@ -68,6 +68,7 @@ public class ProductosController extends HttpServlet {
 		super.init(config);
 		try {
 			dao = ProductoDAO.getInstance();
+			daoUsuario = UsuarioDAO.getInstance();
 
 			// Crear Factoria y Validador
 			factory = Validation.buildDefaultValidatorFactory();
@@ -84,6 +85,7 @@ public class ProductosController extends HttpServlet {
 	public void destroy() {
 		super.destroy();
 		dao = null;
+		daoUsuario = null;
 		factory = null;
 	}
 
@@ -138,6 +140,9 @@ public class ProductosController extends HttpServlet {
 		} finally {
 			List<Producto> registros = dao.getAll();
 			request.setAttribute("registros", registros);
+			// Obtenemos la lista de todos los usuarios, para luego enviarla a la request
+			// como atributo
+
 			request.getRequestDispatcher(vistaSeleccionada).forward(request, response);
 		}
 
@@ -165,18 +170,12 @@ public class ProductosController extends HttpServlet {
 			if ("".equals(id) || id == null) {
 				// Creamos un nuevo producto para rellenar el formulario
 				p = new Producto();
-				
+
 			} else {
 				// Parseamos el id
 				int idParseado = Integer.parseInt(id);
 				p = dao.getById(idParseado);
-				
-				//Obtenemos la lista de todos los  usuarios, para luego enviarla a la request como atributo
-				listaUsuarios =  daoUsuario.getAll();
-				request.setAttribute("listaUsuarios", listaUsuarios);
-				
-								
-				
+
 			}
 
 		} catch (NumberFormatException e) {
@@ -188,10 +187,11 @@ public class ProductosController extends HttpServlet {
 			request.setAttribute("mensajeAlerta",
 					new Alerta(Alerta.TIPO_DANGER, "Excepción no controlada " + e.getMessage()));
 			vistaSeleccionada = VIEW_TABLA;
-		}finally {
+		} finally {
 			request.setAttribute("producto", p);
+			listaUsuarios =  daoUsuario.getAll();
 			request.setAttribute("listaUsuarios", listaUsuarios);
-			
+
 			vistaSeleccionada = VIEW_FORM;
 		}
 
@@ -202,6 +202,7 @@ public class ProductosController extends HttpServlet {
 		Producto p = new Producto();
 		int idParseado = 0;
 		Set<ConstraintViolation<Producto>> validaciones = null;
+		//TODO necesario arreglar el fallo de que no se recoge el id de usuario.
 
 		// Recogemos los parámetros
 		String pId = request.getParameter("id");
@@ -210,18 +211,21 @@ public class ProductosController extends HttpServlet {
 		String pImagen = request.getParameter("imagen");
 		String pDescripcion = request.getParameter("descripcion");
 		String pDescuento = request.getParameter("descuento");
+		String idUsuario = request.getParameter("");
 		try {
 			// Comprobamos
 
 			idParseado = Integer.parseInt(pId);
 			float precioParseado = Float.parseFloat(pPrecio);
 			int descuentoParseado = Integer.parseInt(pDescuento);
-
+			Usuario usuario = new Usuario();
+			
 			p.setNombre(pNombre);
 			p.setPrecio(precioParseado);
 			p.setImagen(pImagen);
 			p.setDescripcion(pDescripcion);
 			p.setDescuento(descuentoParseado);
+			p.setUsuario(usuario);
 
 			validaciones = validator.validate(p);
 		} catch (Exception e) {

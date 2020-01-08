@@ -18,8 +18,7 @@ public class UsuarioDAO implements IUsuarioDAO {
 
 	private final static Logger LOG = Logger.getLogger(UsuarioDAO.class);
 
-	private static final String SQL_GET_ALL = "SELECT u.id, user_name, PASSWORD, id_rol , r.nombre AS nombre_rol FROM usuario u, rol r " + 
-			"WHERE u.id_rol = r.id ;";
+	private static final String SQL_GET_ALL = "SELECT u.id, user_name, PASSWORD, id_rol , r.nombre AS nombre_rol FROM usuario u, rol r WHERE u.id_rol = r.id ;";
 	private static final String SQL_GET_BY_ID = "SELECT id, user_name, password , id_rol FROM usuario WHERE id= ?;";
 	private static final String SQL_INSERT = "INSERT INTO usuario ( user_name, password, id_rol ) VALUES (?,?,?);";
 	private static final String SQL_DELETE = "DELETE FROM usuario WHERE id=?;";
