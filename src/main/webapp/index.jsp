@@ -1,8 +1,22 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
  <%@include file="includes/header.jsp" %>
  <%@include file="includes/top-nav.jsp" %>
- 
-    
+ <form name="formulario" method="post">
+ 	<div class="form-group">
+ 		<input type="text" class="form-control" id="productoBuscado" name="productoBuscado">
+ 	</div>
+ 	<div class="form-group">
+ 		<select class="browser-default custom-select">
+ 			<c:forEach items="${categorias}" var="categoria">
+ 				<option value="${categoria.id}">${categoria.nombre}</option>
+ 			</c:forEach>
+ 			
+ 		</select>
+ 	</div>
+  	
+ </form>
+
+
         <div class="row contenedor-productos">
 			<c:forEach items="${productos}" var="producto">
             
@@ -27,6 +41,8 @@
 	                        <p class="text-muted precio-unidad">(18,50€ / litro)</p>
 	                        <p class="nombre">${producto.nombre }
 	                        <p class="descripcion">${producto.descripcion}</p>
+	                        <p class="categoria">${producto.categoria.nombre}</p>
+	                        <p><b>Creado por: ${producto.usuario.nombre}</b></p>
 	                    </div>
 	
 	                    <div class="botones">

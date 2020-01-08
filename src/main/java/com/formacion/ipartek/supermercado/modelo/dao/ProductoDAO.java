@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 
 import com.formacion.ipartek.supermercado.controller.mipanel.ProductosController;
 import com.formacion.ipartek.supermercado.modelo.bd.ConnectionManager;
+import com.formacion.ipartek.supermercado.modelo.pojo.Categoria;
 import com.formacion.ipartek.supermercado.modelo.pojo.Producto;
 import com.formacion.ipartek.supermercado.modelo.pojo.Rol;
 import com.formacion.ipartek.supermercado.modelo.pojo.Usuario;
@@ -19,9 +20,10 @@ import com.formacion.ipartek.supermercado.modelo.pojo.Usuario;
 public class ProductoDAO implements IProductoDAO {
 
 	private static ProductoDAO INSTANCE;
+
 	private final static Logger LOG = Logger.getLogger(ProductoDAO.class);
 
-	private static final String SQL_GET_ALL = "SELECT u.id AS id_usuario, u.user_name, u.password, p.id AS id_producto, p.nombre, p.precio, p.imagen, p.descripcion, p.descuento FROM producto p  INNER JOIN usuario u WHERE p.id_usuario = u.id ORDER BY p.nombre ASC LIMIT 500";
+	private static final String SQL_GET_ALL = "SELECT u.id AS id_usuario, u.user_name, u.password, p.id AS id_producto, p.nombre, p.precio, p.imagen, p.descripcion, p.descuento, c.id AS id_categoria, c.nombre AS nombre_categoria FROM producto p  INNER JOIN usuario u INNER JOIN categoria c ON p.id_categoria = c.id WHERE p.id_usuario = u.id  ORDER BY p.nombre ASC LIMIT 500";
 	private static final String SQL_GET_BY_ID = "SELECT p.id 'id_producto', p.nombre 'nombre_producto', p.precio, p.imagen, p.descripcion, p.descuento, u.id 'id_usuario', u.user_name 'nombre_usuario', r.nombre 'nombre_rol', u.id_rol FROM producto p INNER JOIN usuario u ON p.id_usuario = u.id AND p.id=? INNER JOIN rol r ON u.id_rol = r.id ORDER BY p.id DESC LIMIT 500;";
 	private static final String SQL_UPDATE = "UPDATE producto SET nombre = ?, precio = ?, imagen = ?, descripcion = ?, descuento = ?, id_usuario = ? WHERE id = ?";
 	private static final String SQL_INSERT = "INSERT INTO producto ( nombre, precio, imagen, descripcion, descuento, id_usuario) VALUES ( ? , ?, ?, ? , ?, ?);";
@@ -69,6 +71,11 @@ public class ProductoDAO implements IProductoDAO {
 				u.setNombre(rs.getString("user_name"));
 				u.setPassword(rs.getString("password"));
 				p.setUsuario(u);
+				
+				Categoria c = new Categoria();
+				c.setId(rs.getInt("id_categoria"));
+				c.setNombre(rs.getString("nombre_categoria"));
+				p.setCategoria(c);
 				registros.add(p);
 
 			}
@@ -333,9 +340,19 @@ public class ProductoDAO implements IProductoDAO {
 		p.setDescripcion(rs.getString("descripcion"));
 		p.setDescuento(rs.getInt("descuento"));
 		p.setUsuario(daoUsuario.getById(rs.getInt("id_usuario")));
-
 		
 
+		Usuario u = new Usuario();
+		u.setId(rs.getInt("id_usuario"));
+		u.setNombre(rs.getString("user_name"));
+		u.setPassword(rs.getString("password"));
+		
+		/*
+		Categoria c = new Categoria();
+		c.setId(rs.getInt("id_categoria"));
+		c.setNombre(rs.getString("nombre_categoria"));
+		p.setCategoria(c);
+		*/
 		return p;
 	}
 

@@ -34,6 +34,8 @@ public class Producto {
 	@Max(100)
 	private int descuento;
 	
+	private Categoria categoria;
+	
 	
 	//Constructor de inicialización
 	public Producto() {
@@ -45,6 +47,7 @@ public class Producto {
 		this.descripcion="";
 		this.descuento=DESCUENTO_MIN;
 		this.usuario=new Usuario();
+		this.categoria = new Categoria();
 	}
 	
 	//Getters y Setters
@@ -93,6 +96,13 @@ public class Producto {
 		this.usuario = usuario;
 	}
 	
+	public Categoria getCategoria() {
+		return categoria;
+	}
+
+	public void setCategoria(Categoria categoria) {
+		this.categoria = categoria;
+	}
 	
 
 	@Override
@@ -106,6 +116,8 @@ public class Producto {
 		float precioFinal = this.precio - aDescontar;
 		return precioFinal;
 	}
+
+	
 	
 	
 	

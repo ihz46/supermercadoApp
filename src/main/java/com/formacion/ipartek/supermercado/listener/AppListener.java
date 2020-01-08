@@ -19,15 +19,8 @@ public class AppListener implements ServletContextListener {
 	private final static Logger LOG = Logger.getLogger(AppListener.class);
 
 	public void contextInitialized(ServletContextEvent sce) {
-		LOG.debug("Se ha iniciado la aplicacion");
-
-		ServletContext sc = sce.getServletContext();
-		if (ConnectionManager.getConnection() == null) {
-			sc.getRequestDispatcher("/error.jsp");
-		}else {
-			sc.getRequestDispatcher("/inicio");
-		}
-
+		LOG.debug("Se ha iniciado la aplicacion ");
+	
 	}
 
 	public void contextDestroyed(ServletContextEvent sce) {
