@@ -25,18 +25,11 @@ public class SeguridadFilter implements Filter {
 	private final static Logger LOG = Logger.getLogger(SeguridadFilter.class);
 
 
-    /**
-     * Default constructor. 
-     */
-    public SeguridadFilter() {
-        // TODO Auto-generated constructor stub
-    }
-
 	/**
 	 * @see Filter#destroy()
 	 */
 	public void destroy() {
-		// TODO Auto-generated method stub
+		
 	}
 
 	/**
@@ -64,7 +57,7 @@ public class SeguridadFilter implements Filter {
 	 * @see Filter#init(FilterConfig)
 	 */
 	public void init(FilterConfig fConfig) throws ServletException {
-		// TODO Auto-generated method stub
+		
 	}
 
 }

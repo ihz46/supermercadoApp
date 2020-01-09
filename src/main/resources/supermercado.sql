@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `categoria` (
   `nombre` varchar(100) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `nombre` (`nombre`)
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=latin1;
 
 -- Volcando datos para la tabla supermercado.categoria: ~14 rows (aproximadamente)
 DELETE FROM `categoria`;
@@ -40,8 +40,7 @@ INSERT INTO `categoria` (`id`, `nombre`) VALUES
 	(4, 'limpieza'),
 	(11, 'menaje'),
 	(8, 'panaderia'),
-	(13, 'prueba1'),
-	(22, 'pruebita');
+	(23, 'telefonia');
 /*!40000 ALTER TABLE `categoria` ENABLE KEYS */;
 
 -- Volcando estructura para tabla supermercado.producto
@@ -60,7 +59,7 @@ CREATE TABLE IF NOT EXISTS `producto` (
   KEY `fk_producto_categoria` (`id_categoria`),
   CONSTRAINT `fk_producto_categoria` FOREIGN KEY (`id_categoria`) REFERENCES `categoria` (`id`),
   CONSTRAINT `fk_producto_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=latin1;
 
 -- Volcando datos para la tabla supermercado.producto: ~10 rows (aproximadamente)
 DELETE FROM `producto`;

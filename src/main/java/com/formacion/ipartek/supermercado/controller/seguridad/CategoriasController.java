@@ -20,16 +20,12 @@ import org.apache.log4j.Logger;
 
 import com.formacion.ipartek.supermercado.controller.Alerta;
 import com.formacion.ipartek.supermercado.modelo.dao.CategoriaDAO;
-import com.formacion.ipartek.supermercado.modelo.dao.ProductoDAO;
-import com.formacion.ipartek.supermercado.modelo.dao.UsuarioDAO;
 import com.formacion.ipartek.supermercado.modelo.pojo.Categoria;
-import com.formacion.ipartek.supermercado.modelo.pojo.Producto;
-import com.formacion.ipartek.supermercado.modelo.pojo.Usuario;
 
 /**
  * Servlet implementation class CategoriasController
  */
-@WebServlet("/categorias")
+@WebServlet("/seguridad/categorias")
 public class CategoriasController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	// Log
@@ -57,7 +53,7 @@ public class CategoriasController extends HttpServlet {
 	// Variables globales
 
 	private String pAccion;
-	private int idCategoria;
+	
 	private String nombreCategoria;
 
 	@Override
@@ -95,7 +91,7 @@ public class CategoriasController extends HttpServlet {
 	private void doAction(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// 1. Recoger parámetros
 
-				String pAccion = request.getParameter("accion");
+				pAccion = request.getParameter("accion");
 
 				try {
 
@@ -128,9 +124,9 @@ public class CategoriasController extends HttpServlet {
 				} catch (Exception e) {
 					LOG.error(e);
 				} finally {
-					List<Categoria> registros = daoCategoria.getAll();
+					List<Categoria> listaCategorias = daoCategoria.getAll();
 					
-					request.setAttribute("registros", registros);
+					request.setAttribute("listaCategorias", listaCategorias);
 					
 
 					request.getRequestDispatcher(vistaSeleccionada).forward(request, response);
@@ -194,7 +190,7 @@ public class CategoriasController extends HttpServlet {
 		
 		int idParseado = 0;
 		Set<ConstraintViolation<Categoria>> validaciones = null;
-		//TODO necesario arreglar el fallo de que no se recoge el id de usuario.
+		
 
 		// Recogemos los parámetros
 		String idCategoria = request.getParameter("id");
@@ -228,7 +224,7 @@ public class CategoriasController extends HttpServlet {
 			request.setAttribute("mensajeAlerta", new Alerta(Alerta.TIPO_WARNING, mensaje.toString()));
 		} else {
 			if ("0".equals(idCategoria)) {
-				// Instanciamos un nuevo pojo (producto)
+				// Instanciamos un nuevo pojo (categoria)
 				
 				categoria = daoCategoria.create(c);
 				vistaSeleccionada = VIEW_FORM;
@@ -249,7 +245,7 @@ public class CategoriasController extends HttpServlet {
 
 	private void listar(HttpServletRequest request, HttpServletResponse response) {
 		List<Categoria> listaCategorias = daoCategoria.getAll();
-		request.setAttribute("registros", listaCategorias);
+		request.setAttribute("listaCategorias", listaCategorias);
 		vistaSeleccionada = VIEW_TABLA;
 
 	}

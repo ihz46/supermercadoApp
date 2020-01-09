@@ -35,7 +35,7 @@ public class InicioController extends HttpServlet {
 			dao = ProductoDAO.getInstance();
 			daoCategoria = CategoriaDAO.getInstance();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
 		
